@@ -4,7 +4,7 @@ from flask import Flask, request, render_template, redirect, Response, session
 import redis
 
 app = Flask(__name__)
-app.config['REDIS_URL'] = 'redis://:conf@redis_server_ip:redis_server_port/0'
+app.config['REDIS_URL'] = 'redis://:test@localhost:6379/0'
 app.config['SERVER_NAME'] = 'localhost:5000'
 r = redis.StrictRedis.from_url(app.config['REDIS_URL'], charset="utf-8", decode_responses=True)
 
