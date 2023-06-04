@@ -6,7 +6,7 @@ import redis
 app = Flask(__name__)
 app.config['REDIS_URL'] = 'redis://:test@localhost:6379/0'
 app.secret_key = 'some_unique_and_secret_key'
-app.config['SERVER_NAME'] = '172.31.91.43:5000'
+app.config['SERVER_NAME'] = 'http://127.0.0.1:80'
 r = redis.StrictRedis.from_url(app.config['REDIS_URL'], charset="utf-8", decode_responses=True)
 
 def event_stream():
