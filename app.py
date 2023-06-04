@@ -1,46 +1,36 @@
-import datetime
-import flask
-from flask import Flask, request, render_template, redirect, Response, session
-import redis
+import logging
+from flask import Flask
+from flask import jsonify
+from flask_cors import CORS
+from redis import Redis
 
 app = Flask(__name__)
-app.config['REDIS_URL'] = 'redis://:test@localhost:6379/0'
-app.secret_key = 'some_unique_and_secret_key'
-app.config['SERVER_NAME'] = 'www.bones2peaches.com'
-r = redis.StrictRedis.from_url(app.config['REDIS_URL'], decode_responses=True)
+CORS(app)  # Enable CORS
+redis = Redis(host='localhost', port=6379, db=0, password='test')
 
+# Set up logging
+handler = logging.FileHandler('flask.log')  # logs to a file named flask.log
+handler.setLevel(logging.INFO)  # Set the log level to INFO; This will write all INFO and higher level messages to the log file
+app.logger.addHandler(handler)  # Add the handler to Flask's logger
 
-def event_stream():
-    pubsub = r.pubsub(ignore_subscribe_messages=True)
-    pubsub.subscribe('messages')
-    for message in pubsub.listen():
-        yield 'data: {}\n\n'.format(message['data'])
-
-@app.route('/api/stream')
-def stream():
-    return Response(event_stream(), mimetype="text/event-stream")
-
-@app.route('/api/', methods=['GET', 'POST'])
-def home():
-    if request.method == 'POST':
-        message = request.form['message']
-        user = session.get('user', 'anonymous')
-        now = datetime.datetime.now().replace(microsecond=0).time()
-        r.publish('messages', '[%s] %s: %s' % (now.isoformat(), user, message))
-        return redirect('http://www.bones2peaches.com/api/')
-    return render_template('chat.html')
-
-@app.route('/api/login', methods=['GET', 'POST'])
-def login():
-    if request.method == 'POST':
-        session['user'] = request.form['user']
-        return redirect('http://www.bones2peaches.com/api/')
-    return render_template('login.html')
+@app.route('/api/ui/home')
+def hello():
+    redis.incr('hits')  # Increment the 'hits' key by 1
+    hits = redis.get('hits')  # Get the value of the 'hits' key
+    app.logger.info('Page hit: %s', hits.decode())  # Log page hit count
+    return jsonify({"message" : 'hits'}),200
 
 @app.route('/api/ui/health')
 def health_check():
-    return {"status": "ok"}
+    return jsonify({"message": "true"}), 200
 
-if __name__ == '__main__':
-    app.debug = True
-    app.run(threaded=True , host = '0.0.0.0' , port = '5000' )
+
+@app.route('/api/channel/health')
+def health_check():
+    return jsonify({"message": "true"}), 200
+
+
+
+
+if __name__ == "__main__":
+    app.run(host='0.0.0.0', port=5000, debug=True)
