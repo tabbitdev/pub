@@ -26,14 +26,14 @@ def home():
         user = session.get('user', 'anonymous')
         now = datetime.datetime.now().replace(microsecond=0).time()
         r.publish('messages', '[%s] %s: %s' % (now.isoformat(), user, message))
-        return redirect('/api/')
+        return redirect('http://127.0.0.1:80/api/')
     return render_template('chat.html')
-
 @app.route('/api/login', methods=['GET', 'POST'])
+
 def login():
     if request.method == 'POST':
         session['user'] = request.form['user']
-        return redirect('/api/')
+        return redirect('http://127.0.0.1:80/api/')
     return render_template('login.html')
 
 @app.route('/api/ui/health')
