@@ -35,5 +35,10 @@ def login():
         return redirect('/api/')
     return render_template('login.html')
 
+
+@app.route('/api/ui/health')
+def health_check():
+    return jsonify({"message": "true"}), 200
+
 if __name__ == '__main__':
     app.run(port=5000)
