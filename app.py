@@ -6,7 +6,7 @@ import redis
 app = Flask(__name__)
 app.config['REDIS_URL'] = 'redis://:test@localhost:6379/0'
 app.secret_key = 'some_unique_and_secret_key'
-app.config['SERVER_NAME'] = 'http://127.0.0.1:80'
+app.config['SERVER_NAME'] = 'www.bones2peaches.com'
 r = redis.StrictRedis.from_url(app.config['REDIS_URL'], charset="utf-8", decode_responses=True)
 
 def event_stream():
@@ -26,14 +26,14 @@ def home():
         user = session.get('user', 'anonymous')
         now = datetime.datetime.now().replace(microsecond=0).time()
         r.publish('messages', '[%s] %s: %s' % (now.isoformat(), user, message))
-        return redirect('http://127.0.0.1:80/api/')
+        return redirect('http://www.bones2peaches.com/api/')
     return render_template('chat.html')
-@app.route('/api/login', methods=['GET', 'POST'])
 
+@app.route('/api/login', methods=['GET', 'POST'])
 def login():
     if request.method == 'POST':
         session['user'] = request.form['user']
-        return redirect('http://127.0.0.1:80/api/')
+        return redirect('http://www.bones2peaches.com/api/')
     return render_template('login.html')
 
 @app.route('/api/ui/health')
