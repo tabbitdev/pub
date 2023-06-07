@@ -6,7 +6,7 @@ from redis import Redis
 
 app = Flask(__name__)
 CORS(app)  # Enable CORS
-redis = Redis(host='localhost', port=6379, db=0, password='test')
+redis = Redis(host='localhost', port=6380, db=0, password='test')
 
 # Set up logging
 handler = logging.FileHandler('flask.log')  # logs to a file named flask.log
